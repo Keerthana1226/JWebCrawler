@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration; // Import this
 
 public class PageDownloader {
 
@@ -14,6 +15,11 @@ public class PageDownloader {
         this.httpClient = HttpClient.newBuilder()
                 .version(HttpClient.Version.HTTP_2)
                 .followRedirects(HttpClient.Redirect.ALWAYS)
+                // =======================================================
+                // NEW: ADD A CONNECTION TIMEOUT
+                // =======================================================
+                .connectTimeout(Duration.ofSeconds(10)) // Give up after 10 seconds
+                // =======================================================
                 .build();
     }
 
@@ -22,6 +28,11 @@ public class PageDownloader {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .header("User-Agent", "JWebCrawler/1.0")
+                    // =======================================================
+                    // NEW: ADD A REQUEST TIMEOUT
+                    // =======================================================
+                    .timeout(Duration.ofSeconds(15)) // The entire request must finish in 15 seconds
+                    // =======================================================
                     .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
