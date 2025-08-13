@@ -9,40 +9,45 @@ public class CrawlerWorker implements Runnable {
 
     private final Queue<String> frontier;
     private final Set<String> visited;
-    private final AtomicInteger activeWorkers; // Shared counter
+    private final AtomicInteger activeWorkers;
+    private final RobotsTxtManager robotsTxtManager;
 
     private final PageDownloader downloader = new PageDownloader();
     private final PageParser parser = new PageParser();
 
-    // Update the constructor to accept the shared counter
-    public CrawlerWorker(Queue<String> frontier, Set<String> visited, AtomicInteger activeWorkers) {
+    public CrawlerWorker(Queue<String> frontier, Set<String> visited, AtomicInteger activeWorkers, RobotsTxtManager robotsTxtManager) {
         this.frontier = frontier;
         this.visited = visited;
         this.activeWorkers = activeWorkers;
+        this.robotsTxtManager = robotsTxtManager;
     }
 
     @Override
     public void run() {
-        // The main loop now continues as long as this thread hasn't been interrupted.
         while (!Thread.currentThread().isInterrupted()) {
+            if (visited.size() >= CrawlerApp.MAX_PAGES_TO_CRAWL) {
+                break; // Stop if the global limit is reached
+            }
+
             String currentUrl = frontier.poll();
 
             if (currentUrl == null) {
-                // Frontier is empty. If no other workers are busy, we might be done.
-                // A worker can exit its loop if the frontier is empty and no other threads are working.
                 if (activeWorkers.get() == 0) {
-                    break; // Exit the loop
+                    break; // The crawl is finished, exit the loop
                 }
-                // Otherwise, wait a bit for other threads to maybe populate the frontier.
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(100); // Wait for more URLs
                 } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt(); // Preserve the interrupted status
+                    Thread.currentThread().interrupt();
                 }
-                continue; // Try polling again
+                continue;
             }
 
-            // If we got a URL, we are now "active".
+            if (!robotsTxtManager.isAllowed(currentUrl)) {
+                System.out.println("Disallowed by robots.txt: " + currentUrl);
+                continue; // Skip this URL and get the next one
+            }
+
             activeWorkers.incrementAndGet();
 
             System.out.println(Thread.currentThread().getName() + " is crawling: " + currentUrl);
@@ -51,13 +56,11 @@ public class CrawlerWorker implements Runnable {
             if (html != null) {
                 List<String> newLinks = parser.parse(html, currentUrl);
                 for (String link : newLinks) {
-                    if (visited.add(link)) {
+                    if (visited.size() < CrawlerApp.MAX_PAGES_TO_CRAWL && visited.add(link)) {
                         frontier.add(link);
                     }
                 }
             }
-
-            // We are done with this URL, so we are no longer "active".
             activeWorkers.decrementAndGet();
         }
         System.out.println(Thread.currentThread().getName() + " finished.");
