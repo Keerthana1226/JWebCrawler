@@ -27,13 +27,13 @@ It respects `robots.txt`, parses pages with jsoup, and saves results (URL, Title
 ## Project Structure
 
 src/main/java/com/jwebcrawler/
-    ├── CrawlData.java # Record holding (URL, Title, Description)
-    ├── CrawlerApp.java # Main entrypoint, sets up crawling
-    ├── CrawlerWorker.java # Worker threads that download & parse pages
-    ├── DataWriter.java # Thread-safe CSV writer
-    ├── PageDownloader.java # Handles HTTP requests
-    ├── PageParser.java # Extracts links from HTML
-    └── RobotsTxtManager.java # Fetches & parses robots.txt rules
+├── CrawlData.java # Record holding (URL, Title, Description)
+├── CrawlerApp.java # Main entrypoint, sets up crawling
+├── CrawlerWorker.java # Worker threads that download & parse pages
+├── DataWriter.java # Thread-safe CSV writer
+├── PageDownloader.java # Handles HTTP requests
+├── PageParser.java # Extracts links from HTML
+└── RobotsTxtManager.java # Fetches & parses robots.txt rules
 
   
 ---
@@ -45,11 +45,11 @@ src/main/java/com/jwebcrawler/
 git clone https://github.com/yourusername/JWebCrawler.git
 cd JWebCrawler
 ```
-### 1. Build with Maven
+### 2. Build with Maven
 ```bash
 mvn clean install
 ```
-### 2. Run the crawler
+### 3. Run the crawler
 ```bash
 mvn exec:java -Dexec.mainClass="com.jwebcrawler.CrawlerApp"
 ```
@@ -59,8 +59,8 @@ By default, it starts crawling from https://jsoup.org/ and saves results to resu
 
 ## Output
 Results are saved in CSV format:
-"URL","Title","Description"
-"https://jsoup.org/","jsoup Java HTML Parser","jsoup is a Java library for working with real-world HTML."
+- "URL","Title","Description"
+- "https://jsoup.org/","jsoup Java HTML Parser","jsoup is a Java library for working with real-world HTML."
 ...
 
 ---
