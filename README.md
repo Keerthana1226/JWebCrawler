@@ -27,10 +27,10 @@ It respects `robots.txt`, parses pages with jsoup, and saves results (URL, Title
 ## Project Structure
 
 src/
-  └── main/
-  └── java/
-  └── com/
-  └── jwebcrawler/
+  -└── main/
+  -└── java/
+  -└── com/
+  -└── jwebcrawler/
   ├── CrawlData.java # Record holding (URL, Title, Description)
   ├── CrawlerApp.java # Main entrypoint, sets up crawling
   ├── CrawlerWorker.java # Worker threads that download & parse pages
